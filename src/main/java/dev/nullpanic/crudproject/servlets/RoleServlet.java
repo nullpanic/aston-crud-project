@@ -1,6 +1,8 @@
 package dev.nullpanic.crudproject.servlets;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.zaxxer.hikari.HikariDataSource;
+import dev.nullpanic.crudproject.configs.DataSource;
 import dev.nullpanic.crudproject.dto.RoleDTO;
 import dev.nullpanic.crudproject.mappers.RoleMapper;
 import dev.nullpanic.crudproject.mappers.RoleMapperImpl;
@@ -9,7 +11,6 @@ import dev.nullpanic.crudproject.persist.repositories.RoleDAOImpl;
 import dev.nullpanic.crudproject.services.*;
 import org.apache.commons.lang3.StringUtils;
 
-import javax.servlet.ServletException;
 import javax.servlet.annotation.WebServlet;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
@@ -30,7 +31,7 @@ public class RoleServlet extends HttpServlet {
     @Override
     public void init() {
         servletService = new ServletServiceImpl();
-        roleService = new RoleServiceImpl(new RoleDAOImpl());
+        roleService = new RoleServiceImpl(new RoleDAOImpl(new HikariDataSource(DataSource.config)));
         mapper = new ObjectMapper();
         roleMapper = new RoleMapperImpl();
     }
@@ -147,7 +148,7 @@ public class RoleServlet extends HttpServlet {
     }
 
     @Override
-    protected void doDelete(HttpServletRequest req, HttpServletResponse resp) throws  IOException {
+    protected void doDelete(HttpServletRequest req, HttpServletResponse resp) throws IOException {
         String pathInfo = req.getPathInfo();
 
         if (pathInfo == null || "/".equals(pathInfo)) {

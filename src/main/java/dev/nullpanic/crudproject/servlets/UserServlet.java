@@ -1,6 +1,8 @@
 package dev.nullpanic.crudproject.servlets;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.zaxxer.hikari.HikariDataSource;
+import dev.nullpanic.crudproject.configs.DataSource;
 import dev.nullpanic.crudproject.dto.RoleDTO;
 import dev.nullpanic.crudproject.dto.UserDTO;
 import dev.nullpanic.crudproject.mappers.RoleMapper;
@@ -36,9 +38,9 @@ public class UserServlet extends HttpServlet {
 
     @Override
     public void init() {
-        userService = new UserServiceImpl(new UserDAOImpl());
+        userService = new UserServiceImpl(new UserDAOImpl(new HikariDataSource(DataSource.config)));
         servletService = new ServletServiceImpl();
-        roleService = new RoleServiceImpl(new RoleDAOImpl());
+        roleService = new RoleServiceImpl(new RoleDAOImpl(new HikariDataSource(DataSource.config)));
         mapper = new ObjectMapper();
         userMapper = new UserMapperImpl();
         roleMapper = new RoleMapperImpl();

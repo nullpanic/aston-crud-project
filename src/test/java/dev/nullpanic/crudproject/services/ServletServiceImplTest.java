@@ -2,9 +2,7 @@ package dev.nullpanic.crudproject.services;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import org.mockito.Mock;
 import org.mockito.Mockito;
-import org.mockito.MockitoAnnotations;
 
 import javax.servlet.ServletOutputStream;
 import javax.servlet.http.HttpServletRequest;
@@ -44,10 +42,10 @@ class ServletServiceImplTest {
     @Test
     public void testSendJsonResponse_ShouldSendResponseWith200Code_WhenInvoked() throws IOException {
         Mockito.when(httpServletResponse.getOutputStream())
-                        .thenReturn(servletOutputStream);
+                .thenReturn(servletOutputStream);
         Mockito.doNothing().when(servletOutputStream).print(JSON);
 
-        servletService.sendJsonResponse(JSON,httpServletResponse);
+        servletService.sendJsonResponse(JSON, httpServletResponse);
 
         Mockito.verify(httpServletResponse).setStatus(200);
         Mockito.verify(httpServletResponse).getOutputStream();

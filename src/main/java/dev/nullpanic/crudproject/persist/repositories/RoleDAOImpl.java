@@ -1,8 +1,8 @@
 package dev.nullpanic.crudproject.persist.repositories;
 
-import dev.nullpanic.crudproject.configs.DataSource;
 import dev.nullpanic.crudproject.persist.models.Role;
 
+import javax.sql.DataSource;
 import java.sql.*;
 import java.util.HashSet;
 import java.util.Optional;
@@ -10,9 +10,15 @@ import java.util.Set;
 
 public class RoleDAOImpl implements RoleDAO {
 
+    DataSource ds;
+
+    public RoleDAOImpl(DataSource ds) {
+        this.ds = ds;
+    }
+
     @Override
     public Optional<Role> get(Long id) throws SQLException {
-        try (Connection connection = DataSource.getConnection();
+        try (Connection connection = ds.getConnection();
              PreparedStatement statement = connection.prepareStatement("SELECT * FROM roles WHERE id = ?")) {
             statement.setLong(1, id);
 
@@ -31,7 +37,7 @@ public class RoleDAOImpl implements RoleDAO {
 
     @Override
     public Set<Role> getAll() throws SQLException {
-        try (Connection connection = DataSource.getConnection();
+        try (Connection connection = ds.getConnection();
              Statement statement = connection.createStatement()) {
             ResultSet resultSet = statement.executeQuery("SELECT * FROM roles");
             Set<Role> roles = new HashSet<>();
@@ -49,7 +55,7 @@ public class RoleDAOImpl implements RoleDAO {
 
     @Override
     public Role create(Role role) throws SQLException {
-        try (Connection connection = DataSource.getConnection();
+        try (Connection connection = ds.getConnection();
              PreparedStatement statement = connection.prepareStatement("INSERT INTO roles(name) VALUES (?)",
                      Statement.RETURN_GENERATED_KEYS)) {
 
@@ -74,7 +80,7 @@ public class RoleDAOImpl implements RoleDAO {
 
     @Override
     public boolean update(Role role) throws SQLException {
-        try (Connection connection = DataSource.getConnection();
+        try (Connection connection = ds.getConnection();
              PreparedStatement statement = connection.prepareStatement("UPDATE roles SET name = ? WHERE id = ?")) {
             statement.setString(1, role.getRole());
             statement.setLong(2, role.getId());
@@ -87,7 +93,7 @@ public class RoleDAOImpl implements RoleDAO {
 
     @Override
     public boolean delete(Role role) throws SQLException {
-        try (Connection connection = DataSource.getConnection();
+        try (Connection connection = ds.getConnection();
              PreparedStatement statement = connection.prepareStatement("DELETE FROM roles WHERE id = ?")) {
             statement.setLong(1, role.getId());
 

@@ -1,17 +1,15 @@
 package dev.nullpanic.crudproject.mappers;
 
 import dev.nullpanic.crudproject.dto.RoleDTO;
-import dev.nullpanic.crudproject.dto.UserDTO;
 import dev.nullpanic.crudproject.persist.models.Role;
-import dev.nullpanic.crudproject.persist.models.User;
 
-public class RoleMapperImpl implements RoleMapper{
+public class RoleMapperImpl implements RoleMapper {
 
     @Override
     public RoleDTO roleToRoleDTO(Role role) {
         return RoleDTO.builder()
                 .id(role.getId())
-                .role(role.getRole().toString())
+                .role(role.getRole())
                 .build();
     }
 

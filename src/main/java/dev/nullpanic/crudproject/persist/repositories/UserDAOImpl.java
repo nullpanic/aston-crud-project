@@ -1,15 +1,21 @@
 package dev.nullpanic.crudproject.persist.repositories;
 
-import dev.nullpanic.crudproject.configs.DataSource;
 import dev.nullpanic.crudproject.persist.models.Role;
 import dev.nullpanic.crudproject.persist.models.User;
 
+import javax.sql.DataSource;
 import java.sql.*;
 import java.util.HashSet;
 import java.util.Optional;
 import java.util.Set;
 
 public class UserDAOImpl implements UserDAO {
+
+    DataSource ds;
+
+    public UserDAOImpl(DataSource ds) {
+        this.ds = ds;
+    }
 
     private static final String SQL_GET_USER_ROLES = """
             SELECT
@@ -34,7 +40,7 @@ public class UserDAOImpl implements UserDAO {
 
     @Override
     public Optional<User> getById(Long id) throws SQLException {
-        try (Connection connection = DataSource.getConnection();
+        try (Connection connection = ds.getConnection();
              PreparedStatement statement = connection.prepareStatement("SELECT * FROM users WHERE id = ?")) {
             statement.setLong(1, id);
 
@@ -53,7 +59,7 @@ public class UserDAOImpl implements UserDAO {
 
     @Override
     public Set<User> getAll() throws SQLException {
-        try (Connection connection = DataSource.getConnection();
+        try (Connection connection = ds.getConnection();
              Statement statement = connection.createStatement()) {
             ResultSet resultSet = statement.executeQuery("SELECT * FROM users");
 
@@ -72,7 +78,7 @@ public class UserDAOImpl implements UserDAO {
 
     @Override
     public User create(User user) throws SQLException {
-        try (Connection connection = DataSource.getConnection();
+        try (Connection connection = ds.getConnection();
              PreparedStatement statement = connection.prepareStatement("INSERT INTO users(name) VALUES (?)",
                      Statement.RETURN_GENERATED_KEYS)) {
 
@@ -95,7 +101,7 @@ public class UserDAOImpl implements UserDAO {
 
     @Override
     public Boolean update(User user) throws SQLException {
-        try (Connection connection = DataSource.getConnection();
+        try (Connection connection = ds.getConnection();
              PreparedStatement statement = connection.prepareStatement("UPDATE users SET name = ? WHERE id = ?")) {
             statement.setString(1, user.getName());
             statement.setLong(2, user.getId());
@@ -108,7 +114,7 @@ public class UserDAOImpl implements UserDAO {
 
     @Override
     public Boolean delete(Long id) throws SQLException {
-        try (Connection connection = DataSource.getConnection();
+        try (Connection connection = ds.getConnection();
              PreparedStatement statement = connection.prepareStatement("DELETE FROM users WHERE id = ?")) {
 
             statement.setLong(1, id);
@@ -120,7 +126,7 @@ public class UserDAOImpl implements UserDAO {
 
     @Override
     public Set<Role> getUserRoles(Long userId) throws SQLException {
-        try (Connection connection = DataSource.getConnection();
+        try (Connection connection = ds.getConnection();
              PreparedStatement statement = connection.prepareStatement(SQL_GET_USER_ROLES)) {
             statement.setLong(1, userId);
 
@@ -141,7 +147,7 @@ public class UserDAOImpl implements UserDAO {
 
     @Override
     public Optional<Role> getUserRoleById(Long userId, Long roleId) throws SQLException {
-        try (Connection connection = DataSource.getConnection();
+        try (Connection connection = ds.getConnection();
              PreparedStatement statement = connection.prepareStatement(SQL_GET_USER_ROLE_BY_ID)) {
             statement.setLong(1, userId);
             statement.setLong(2, roleId);
@@ -160,7 +166,7 @@ public class UserDAOImpl implements UserDAO {
 
     @Override
     public Boolean addRoleToUser(User user, Role role) throws SQLException {
-        try (Connection connection = DataSource.getConnection();
+        try (Connection connection = ds.getConnection();
              PreparedStatement statement = connection.prepareStatement("INSERT INTO user_roles VALUES (?,?)")) {
             statement.setLong(1, user.getId());
             statement.setLong(2, role.getId());
@@ -171,7 +177,7 @@ public class UserDAOImpl implements UserDAO {
 
     @Override
     public Boolean deleteUserRole(User user, Role role) throws SQLException {
-        try (Connection connection = DataSource.getConnection();
+        try (Connection connection = ds.getConnection();
              PreparedStatement statement = connection.prepareStatement("DELETE FROM user_roles WHERE user_id = ? AND role_id = ?")) {
             statement.setLong(1, user.getId());
             statement.setLong(2, role.getId());
