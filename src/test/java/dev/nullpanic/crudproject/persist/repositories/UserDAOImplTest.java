@@ -14,9 +14,12 @@ import org.testcontainers.junit.jupiter.Testcontainers;
 import org.testcontainers.utility.DockerImageName;
 
 import javax.sql.DataSource;
+import java.io.IOException;
+import java.io.InputStream;
 import java.sql.SQLException;
 import java.util.Collections;
 import java.util.Optional;
+import java.util.Properties;
 import java.util.Set;
 
 import static org.junit.jupiter.api.Assertions.*;
@@ -24,12 +27,7 @@ import static org.junit.jupiter.api.Assertions.*;
 @Testcontainers
 class UserDAOImplTest {
     @Container
-    private final GenericContainer<?> postgresContainer = new PostgreSQLContainer(DockerImageName.parse("postgres:13.3"))
-            .withDatabaseName("crud_db")
-            .withUsername("admin")
-            .withPassword("qwerty123")
-            .withInitScript("db/init_script.sql")
-            .withTmpFs(Collections.singletonMap("/var/lib/postgresql/data", "rw"));
+    private GenericContainer<?> postgresContainer;
 
     private DataSource dataSource;
 
@@ -39,6 +37,26 @@ class UserDAOImplTest {
     private User userCassandra;
     private Role roleProgrammer;
     private Role roleAdmin;
+
+    {
+        {
+            Properties properties = new Properties();
+
+            try (InputStream inputStream = this.getClass()
+                    .getClassLoader().getResourceAsStream("config.properties")) {
+                properties.load(inputStream);
+            } catch (IOException exception) {
+                exception.printStackTrace();
+            }
+
+            postgresContainer = new PostgreSQLContainer(DockerImageName.parse("postgres:13.3"))
+                    .withDatabaseName(properties.getProperty("db.name"))
+                    .withUsername(properties.getProperty("db.username"))
+                    .withPassword(properties.getProperty("db.password"))
+                    .withInitScript("db/init_script.sql")
+                    .withTmpFs(Collections.singletonMap("/var/lib/postgresql/data", "rw"));
+        }
+    }
 
     @BeforeEach
     public void init() throws SQLException {

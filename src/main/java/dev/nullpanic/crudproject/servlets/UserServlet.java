@@ -2,7 +2,6 @@ package dev.nullpanic.crudproject.servlets;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.zaxxer.hikari.HikariDataSource;
-import dev.nullpanic.crudproject.configs.DataSource;
 import dev.nullpanic.crudproject.dto.RoleDTO;
 import dev.nullpanic.crudproject.dto.UserDTO;
 import dev.nullpanic.crudproject.mappers.RoleMapper;
@@ -16,7 +15,6 @@ import dev.nullpanic.crudproject.services.*;
 import dev.nullpanic.crudproject.persist.repositories.UserDAOImpl;
 import org.apache.commons.lang3.StringUtils;
 
-import javax.servlet.ServletException;
 import javax.servlet.annotation.WebServlet;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
@@ -38,9 +36,10 @@ public class UserServlet extends HttpServlet {
 
     @Override
     public void init() {
-        userService = new UserServiceImpl(new UserDAOImpl(new HikariDataSource(DataSource.config)));
+        HikariConfigService hikariConfigService = new HikariConfigServiceImpl();
+        userService = new UserServiceImpl(new UserDAOImpl(new HikariDataSource(hikariConfigService.getConfigFromProperties("config.properties"))));
         servletService = new ServletServiceImpl();
-        roleService = new RoleServiceImpl(new RoleDAOImpl(new HikariDataSource(DataSource.config)));
+        roleService = new RoleServiceImpl(new RoleDAOImpl(new HikariDataSource(hikariConfigService.getConfigFromProperties("config.properties"))));
         mapper = new ObjectMapper();
         userMapper = new UserMapperImpl();
         roleMapper = new RoleMapperImpl();
